@@ -61,6 +61,7 @@ body {
 }
 
 .nav-link {
+  font-family: 'Star Crush', sans-serif;
   color: #d1d5db;
   text-decoration: none;
   font-size: 16px;
@@ -148,12 +149,14 @@ body {
 }
 
 .home-subtitle {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 28px;
   color: #ffffff;
   margin-bottom: 20px;
 }
 
 .home-description {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 18px;
   color: #9ca3af;
   line-height: 1.6;
@@ -161,6 +164,7 @@ body {
 }
 
 .home-cta-button {
+  font-family: 'Space Grotesk', sans-serif;
   display: inline-block;
   padding: 15px 40px;
   background: #a855f7;
@@ -201,12 +205,14 @@ body {
 }
 
 .feature-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 20px;
   color: #a855f7;
   margin-bottom: 10px;
 }
 
 .feature-card p {
+  font-family: 'Space Grotesk', sans-serif;
   color: #9ca3af;
   font-size: 14px;
 }
@@ -233,6 +239,7 @@ body {
 }
 
 .search-section {
+  font-family: 'Space Grotesk', sans-serif;
   display: flex;
   gap: 10px;
   margin-bottom: 40px;
@@ -243,9 +250,9 @@ body {
   max-width: 450px;
   height: 50px;
   padding: 0 20px;
-  background: #1f1f1f;
-  border: none;
-  border-radius: 25px;
+  background: #0a0a0a;
+  border: 2px solid #a855f7;
+  border-radius: 0px;
   color: #ffffff;
   font-size: 15px;
 }
@@ -257,10 +264,10 @@ body {
 .search-button {
   width: 120px;
   height: 50px;
-  background: #a855f7;
-  border: none;
-  border-radius: 25px;
-  color: #ffffff;
+  background: #0a0a0a;
+  border: 2px solid #a855f7;
+  border-radius: 0px;
+  color: #a855f7;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -348,12 +355,6 @@ body {
   margin-bottom: 25px;
 }
 
-.action-buttons {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
 .button {
   padding: 12px 20px;
   border: none;
@@ -418,8 +419,7 @@ body {
 }
 
 .tracks-list,
-.history-list,
-.favorites-list {
+.history-list{
   background: transparent;
 }
 
@@ -467,6 +467,7 @@ body {
 }
 
 .track-name {
+  font-family: 'Space Grotesk', sans-serif;
   flex: 1;
   display: flex;
   align-items: center;
@@ -504,6 +505,7 @@ body {
 }
 
 .history-item {
+  font-family: 'Space Grotesk', sans-serif;
   color: #d1d5db;
   font-size: 14px;
   cursor: pointer;
@@ -512,31 +514,6 @@ body {
 }
 
 .history-item:hover {
-  color: #a855f7;
-}
-
-.favorites-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 15px;
-}
-
-.favorite-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #ffffff;
-  font-size: 14px;
-  padding: 4px 0;
-}
-
-.favorite-item span {
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.favorite-item span:hover {
   color: #a855f7;
 }
 
@@ -555,41 +532,12 @@ body {
 }
 
 .empty-state {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: bold;
   text-align: center;
   padding: 100px 20px;
   color: #6b7280;
   font-size: 18px;
-}
-
-.similar-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.similar-item {
-  cursor: pointer;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.2s;
-  background: #0f0f0f;
-}
-
-.similar-item:hover {
-  transform: scale(1.05);
-}
-
-.similar-image {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-}
-
-.similar-name {
-  padding: 8px;
-  font-size: 13px;
-  text-align: center;
-  color: #e5e7eb;
 }
 
 /* Modal */
@@ -676,6 +624,7 @@ body {
 }
 
 .song-memory-item {
+  font-family: 'Space Grotesk', sans-serif;
   background: rgba(26, 26, 26, 0.5);
   padding: 12px;
   border-radius: 8px;
@@ -690,12 +639,14 @@ body {
 }
 
 .song-memory-name {
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: bold;
   color: #ffffff;
   font-size: 14px;
 }
 
 .song-memory-artist {
+  font-family: 'Space Grotesk', sans-serif;
   color: #9ca3af;
   font-size: 12px;
   margin-bottom: 8px;

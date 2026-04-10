@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios'; 
 
 interface SongMemory {
+  _id?: string;
   songName: string;
   artistName: string;
   journal: string;
@@ -12,18 +14,28 @@ export default function Journals() {
   const [songMemories, setSongMemories] = useState<SongMemory[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('songMemories');
-    if (saved) {
-      setSongMemories(JSON.parse(saved));
+    const loadJournals = async () => {
+        try {
+        const response = await axios.get('http://localhost:3001/api/journals');
+        setSongMemories(response.data);
+        } catch (error) {
+        console.error('Error loading journals:', error);
+        }
+    };
+
+    loadJournals();
+    }, []);
+
+  const deleteSongMemory = async (id: string) => {
+    try {
+        await axios.delete(`http://localhost:3001/api/journals/${id}`);
+        const updated = songMemories.filter(memory => memory._id !== id);
+        setSongMemories(updated);
+    } catch (error) {
+        console.error('Error deleting journal:', error);
+        alert('Failed to delete journal. Please try again.');
     }
-  }, []);
-
-  const deleteSongMemory = (index: number) => {
-    const updated = songMemories.filter((_, i) => i !== index);
-    setSongMemories(updated);
-    localStorage.setItem('songMemories', JSON.stringify(updated));
-  };
-
+ };
   const timeAgo = (timestamp: string) => {
     const seconds = Math.floor((new Date().getTime() - new Date(timestamp).getTime()) / 1000);
     if (seconds < 60) return 'Just now';
@@ -67,7 +79,7 @@ export default function Journals() {
                   <h3 className="journal-song-name">"{memory.songName}"</h3>
                   <button 
                     className="delete-journal-btn"
-                    onClick={() => deleteSongMemory(index)}
+                    onClick={() => deleteSongMemory(memory._id!)}
                   >
                     🗑️
                   </button>

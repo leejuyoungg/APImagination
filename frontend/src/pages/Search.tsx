@@ -17,24 +17,13 @@ interface Track {
   spotify_url?: string;
 }
 
-interface Favorite {
-  name: string;
-  image: string;
-  addedAt: string;
-}
-
 interface HistoryItem {
   artist: string;
   timestamp: string;
 }
 
-interface SimilarArtist {
-  name: string;
-  image: { '#text': string; size: string }[];
-  url?: string;
-}
-
 interface SongMemory {
+  _id?: string;  // ADD THIS LINE
   songName: string;
   artistName: string;
   journal: string;
@@ -47,11 +36,8 @@ export default function Search() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [previousArtist, setPreviousArtist] = useState<string | null>(null);
-  const [similarArtists, setSimilarArtists] = useState<SimilarArtist[]>([]);
-  const [showSimilar, setShowSimilar] = useState(false);
   const [songMemories, setSongMemories] = useState<SongMemory[]>([]);
   const [showJournalModal, setShowJournalModal] = useState(false);
   const [selectedSong, setSelectedSong] = useState<{ name: string; artist: string } | null>(null);
@@ -59,22 +45,26 @@ export default function Search() {
 
   const BACKEND_URL = 'http://localhost:3001';
 
-  // Load favorites and history from localStorage on mount
-  useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
+    // Load from database on mount
+    useEffect(() => {
     const savedHistory = localStorage.getItem('searchHistory');
-    const savedSongMemories = localStorage.getItem('songMemories');
     
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
     if (savedHistory) {
-      setHistory(JSON.parse(savedHistory));
+        setHistory(JSON.parse(savedHistory));
     }
-    if (savedSongMemories) {
-      setSongMemories(JSON.parse(savedSongMemories));
-    }
-  }, []);
+
+    // Load song memories from database
+    const loadJournals = async () => {
+        try {
+        const response = await axios.get(`${BACKEND_URL}/api/journals`);
+        setSongMemories(response.data);
+        } catch (error) {
+        console.error('Error loading journals:', error);
+        }
+    };
+
+    loadJournals();
+    }, []);
 
   // Search artist
   const searchArtist = async (artistName: string) => {
@@ -99,11 +89,6 @@ export default function Search() {
 
       setArtist(artistData);
       setTracks(tracksData.slice(0, 5));
-
-      // Fetch similar artists
-      const similarResponse = await axios.get(`${BACKEND_URL}/api/artist/${artistName}/similar`);
-      const similarData = similarResponse.data.similarartists?.artist || [];
-      setSimilarArtists(similarData.slice(0, 6));
 
       // Add to history
       addToHistory(artistName);
@@ -130,23 +115,6 @@ export default function Search() {
     localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
   };
 
-  // Save to favorites
-  const saveToFavorites = () => {
-    if (!artist) return;
-
-    const imageUrl = artist.image?.find(img => img.size === 'extralarge')?.[`#text`] || '';
-    
-    const newFavorite: Favorite = {
-      name: artist.name,
-      image: imageUrl,
-      addedAt: new Date().toISOString(),
-    };
-
-    const updatedFavorites = [...favorites.filter(f => f.name !== artist.name), newFavorite];
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-  };
-
   // Play it again (go back to previous artist)
   const playItAgain = () => {
     if (previousArtist) {
@@ -166,8 +134,6 @@ export default function Search() {
     return `${days} day${days > 1 ? 's' : ''} ago`;
   };
 
-  const isFavorite = artist && favorites.some(f => f.name === artist.name);
-
   // Open modal to save song memory
   const openJournalModal = (songName: string) => {
     if (!artist) return;
@@ -176,33 +142,45 @@ export default function Search() {
     setJournalText('');
   };
 
-  // Save song memory with journal
-  const saveSongMemory = () => {
-    if (!selectedSong || !journalText.trim()) return;
+// Save song memory with journal
+const saveSongMemory = async () => {
+  if (!selectedSong || !journalText.trim()) return;
 
-    const newMemory: SongMemory = {
+  try {
+    // Save to database
+    const response = await axios.post(`${BACKEND_URL}/api/journals`, {
       songName: selectedSong.name,
       artistName: selectedSong.artist,
-      journal: journalText.trim(),
-      addedAt: new Date().toISOString(),
-    };
+      journal: journalText.trim()
+    });
 
-    const updatedMemories = [newMemory, ...songMemories];
+    // Add to local state
+    const updatedMemories = [response.data, ...songMemories];
     setSongMemories(updatedMemories);
-    localStorage.setItem('songMemories', JSON.stringify(updatedMemories));
 
     // Close modal
     setShowJournalModal(false);
     setJournalText('');
     setSelectedSong(null);
-  };
+  } catch (error) {
+    console.error('Error saving journal:', error);
+    alert('Failed to save journal. Please try again.');
+  }
+};
 
-  // Delete song memory
-  const deleteSongMemory = (index: number) => {
-    const updatedMemories = songMemories.filter((_, i) => i !== index);
-    setSongMemories(updatedMemories);
-    localStorage.setItem('songMemories', JSON.stringify(updatedMemories));
-  };
+    // Delete song memory
+    const deleteSongMemory = async (id: string) => {
+    try {
+        await axios.delete(`${BACKEND_URL}/api/journals/${id}`);
+        
+        // Remove from local state
+        const updatedMemories = songMemories.filter(memory => memory._id !== id);
+        setSongMemories(updatedMemories);
+    } catch (error) {
+        console.error('Error deleting journal:', error);
+        alert('Failed to delete journal. Please try again.');
+    }
+    };
 
   return (
     <div className="search-page">
@@ -224,7 +202,7 @@ export default function Search() {
             placeholder="Search artist"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && searchArtist(searchInput)}
+            onKeyDown={(e) => e.key === 'Enter' && searchArtist(searchInput)}
           />
           <button 
             className="search-button"
@@ -279,21 +257,6 @@ export default function Search() {
                 {parseInt(artist.stats?.listeners || '0').toLocaleString()} listeners
               </p>
 
-              <div className="action-buttons">
-                <button 
-                  className="button button-primary"
-                  onClick={saveToFavorites}
-                >
-                  {isFavorite ? '💜 Saved' : '💜 Save Memory'}
-                </button>
-                <button 
-                  className="button button-secondary"
-                  onClick={() => setShowSimilar(!showSimilar)}
-                >
-                  🔄 Similar Artists {showSimilar ? '(Hide)' : ''}
-                </button>
-              </div>
-
               {previousArtist && (
                 <button 
                   className="button button-tertiary"
@@ -344,34 +307,6 @@ export default function Search() {
                 </div>
               </div>
 
-              {/* Similar Artists */}
-              {showSimilar && similarArtists.length > 0 && (
-                <div className="sidebar-section">
-                  <h3 className="sidebar-title">SIMILAR ARTISTS</h3>
-                  <div className="similar-grid">
-                    {similarArtists.map((similar, index) => (
-                      <div 
-                        key={index}
-                        className="similar-item"
-                        onClick={() => {
-                          searchArtist(similar.name);
-                          setShowSimilar(false);
-                        }}
-                      >
-                        {similar.image && similar.image[2] && (
-                          <img 
-                            src={similar.image[2]['#text']} 
-                            alt={similar.name}
-                            className="similar-image"
-                          />
-                        )}
-                        <p className="similar-name">{similar.name}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* History */}
               <div className="sidebar-section">
                 <h3 className="sidebar-title">HISTORY</h3>
@@ -398,11 +333,11 @@ export default function Search() {
                         <div className="song-memory-header">
                           <span className="song-memory-name">"{memory.songName}"</span>
                           <button 
-                            className="remove-button"
-                            onClick={() => deleteSongMemory(index)}
-                          >
-                            🗑️
-                          </button>
+                        className="remove-button"
+                        onClick={() => deleteSongMemory(memory._id!)}  // Changed from index
+                        >
+                        🗑️
+                        </button>
                         </div>
                         <p className="song-memory-artist">{memory.artistName}</p>
                         <p className="song-memory-journal">{memory.journal}</p>

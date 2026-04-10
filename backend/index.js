@@ -1,9 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const mongoose = require('mongoose'); 
+const SongMemory = require('./models/SongMemory'); 
+
 require('dotenv').config();
 
-const app = express();
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+  const app = express();
 
 // Middleware
 app.use(cors());
@@ -222,6 +230,47 @@ app.get('/api/artist/:name/similar', async (req, res) => {
   } catch (error) {
     console.error('Error fetching similar artists:', error.message);
     res.status(500).json({ error: 'Failed to fetch similar artists' });
+  }
+});
+
+// Get all journals
+app.get('/api/journals', async (req, res) => {
+  try {
+    const journals = await SongMemory.find().sort({ addedAt: -1 });
+    res.json(journals);
+  } catch (error) {
+    console.error('Error fetching journals:', error);
+    res.status(500).json({ error: 'Failed to fetch journals' });
+  }
+});
+
+// Save new journal
+app.post('/api/journals', async (req, res) => {
+  try {
+    const { songName, artistName, journal } = req.body;
+    
+    const newMemory = new SongMemory({
+      songName,
+      artistName,
+      journal
+    });
+    
+    await newMemory.save();
+    res.status(201).json(newMemory);
+  } catch (error) {
+    console.error('Error saving journal:', error);
+    res.status(500).json({ error: 'Failed to save journal' });
+  }
+});
+
+// Delete journal
+app.delete('/api/journals/:id', async (req, res) => {
+  try {
+    await SongMemory.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Journal deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting journal:', error);
+    res.status(500).json({ error: 'Failed to delete journal' });
   }
 });
 
