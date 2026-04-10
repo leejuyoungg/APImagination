@@ -275,7 +275,7 @@ body {
 }
 
 .search-button:hover {
-  background: #9333ea;
+  background: #a855f7;
 }
 
 .search-button:disabled {
@@ -358,7 +358,7 @@ body {
 .button {
   padding: 12px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 0px;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
@@ -366,19 +366,23 @@ body {
 }
 
 .button-primary {
-  background: #a855f7;
-  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
+  background: #0a0a0a;
+  color: #a855f7;
   flex: 1;
+  border: 2px solid #a855f7;
 }
 
 .button-primary:hover {
-  background: #9333ea;
+  background: #a855f7;
 }
 
 .button-secondary {
-  background: #4b5563;
-  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
+  background: #0a0a0a;
+  color: #a855f7;
   flex: 1;
+  border: 2px solid #a855f7;
 }
 
 .button-secondary:hover {
@@ -667,27 +671,32 @@ body {
 
 /* JOURNALS PAGE */
 .back-button {
+  font-family: 'Space Grotesk', sans-serif;
   display: inline-block;
   padding: 10px 20px;
-  background: #374151;
-  color: #ffffff;
+  background: #0a0a0a;
+  color: #a855f7;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 0px;
   margin-bottom: 30px;
   transition: background 0.2s;
+  border: 2px solid #a855f7;
 }
 
 .back-button:hover {
-  background: #4b5563;
+  background: #a855f7;
 }
 
 .empty-journals {
+
+  font-family: 'Space Grotesk', sans-serif;
   text-align: center;
   padding: 100px 20px;
 }
 
 .empty-journals p {
   color: #9ca3af;
+  font-weight: bold;
   font-size: 18px;
   margin-bottom: 20px;
 }

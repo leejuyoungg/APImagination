@@ -65,7 +65,7 @@ export default function Journals() {
 
         {songMemories.length === 0 ? (
           <div className="empty-journals">
-            <p>📝 No journal entries yet!</p>
+            <p>No journal entries yet!</p>
             <p>Search for artists and save memories for your favorite songs.</p>
             <Link to="/search" className="button button-primary">
               Start Searching
